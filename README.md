@@ -2,36 +2,31 @@
 <html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⏰Control de Horarios y Horas Extra</title>
-  <!-- Tailwind CSS CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Control de Horas & Extras Mobile</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Phosphor Icons for elegant dark icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <!-- Font setup -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-          },
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
           colors: {
-            brand: {
-              bg: '#0F0F12',
-              card: '#18181F',
-              border: '#2A2A36',
-              accent: '#8B5CF6', // Soft Violet
-              accentHover: '#7C3AED',
-              accentGlow: '#8B5CF620',
-              plum: '#A78BFA',
-              textMuted: '#9CA3AF',
-              gold: '#D97706',
+            app: {
+              bg: '#0A0A0C',
+              card: '#141419',
+              cardBorder: '#23232D',
+              purple: '#A855F7',
+              purpleGlow: '#A855F725',
+              cyan: '#06B6D4',
+              pink: '#EC4899',
+              green: '#10B981',
+              subtext: '#9CA3AF'
             }
           }
         }
@@ -40,711 +35,641 @@
   </script>
   <style>
     body {
-      background-color: #0F0F12;
+      background-color: #0A0A0C;
       color: #F3F4F6;
       font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
-    /* Custom Scrollbar for sleek aesthetic */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    input[type="time"], input[type="number"], select, input[type="text"] {
+      color-scheme: dark;
     }
-    ::-webkit-scrollbar-track {
-      background: #18181F;
+    .active-scale:active {
+      transform: scale(0.97);
     }
-    ::-webkit-scrollbar-thumb {
-      background: #2A2A36;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #8B5CF6;
-    }
-    /* Select styling override */
-    select option {
-      background-color: #18181F;
-      color: #F3F4F6;
-    }
-    /* Print Styles for professional export */
-    @media print {
-      .no-print {
-        display: none !important;
-      }
-      body {
-        background-color: #fff !important;
-        color: #000 !important;
-      }
-      .print-border {
-        border: 1px solid #ccc !important;
-      }
-      .card-bg {
-        background-color: #f9fafb !important;
-        color: #000 !important;
-        border: 1px solid #e5e7eb !important;
-      }
+    .neon-border {
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.12);
     }
   </style>
 </head>
-<body class="min-h-screen pb-12 antialiased selection:bg-brand-accent selection:text-white">
+<body class="min-h-screen pb-24 antialiased">
 
-  <!-- Header Banner -->
-  <header class="border-b border-brand-border bg-brand-card/70 backdrop-blur-md sticky top-0 z-30 no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="p-2.5 rounded-xl bg-brand-accent/10 border border-brand-accent/30 text-brand-accent shadow-lg shadow-brand-accent/5">
-          <i class="ph-bold ph-clock-afternoon text-2xl"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            Gestión de Horarios <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-brand-accent/20 text-brand-plum border border-brand-accent/30">v2.0</span>
-          </h1>
-          <p class="text-xs text-brand-textMuted">Control mensual de horas ordinarias, extras y descansos</p>
-        </div>
+  <!-- Mobile Top Sticky Bar -->
+  <header class="sticky top-0 z-30 bg-app-bg/90 backdrop-blur-lg border-b border-app-cardBorder px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-app-purple/20 border border-app-purple/40 flex items-center justify-center text-app-purple shadow-sm">
+        <i class="ph-bold ph-clock text-xl"></i>
       </div>
+      <div>
+        <h1 class="text-base font-bold text-white leading-tight">Control de Horas</h1>
+        <p class="text-[11px] text-app-subtext font-medium" id="headerContractLabel">Contrato: 20h / semana</p>
+      </div>
+    </div>
 
-      <!-- Quick Actions / Top Header Bar -->
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="openSettingsModal()" class="px-3.5 py-2 rounded-xl border border-brand-border bg-brand-card hover:bg-brand-border/50 text-sm font-medium transition-all flex items-center gap-2 text-gray-200 hover:text-white shadow-sm">
-          <i class="ph-bold ph-gear text-brand-plum"></i>
-          <span>Horario Base</span>
-        </button>
-        <button onclick="exportToCSV()" class="px-3.5 py-2 rounded-xl border border-brand-border bg-brand-card hover:bg-brand-border/50 text-sm font-medium transition-all flex items-center gap-2 text-gray-200 hover:text-white shadow-sm">
-          <i class="ph-bold ph-file-csv text-emerald-400"></i>
-          <span>Exportar CSV</span>
-        </button>
-        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl border border-brand-border bg-brand-card hover:bg-brand-border/50 text-sm font-medium transition-all flex items-center gap-2 text-gray-200 hover:text-white shadow-sm">
-          <i class="ph-bold ph-printer text-sky-400"></i>
-          <span>Imprimir / PDF</span>
-        </button>
-      </div>
+    <div class="flex items-center gap-2">
+      <button onclick="openConfigModal()" class="w-9 h-9 rounded-xl bg-app-card border border-app-cardBorder text-gray-300 flex items-center justify-center active-scale">
+        <i class="ph-bold ph-gear text-lg"></i>
+      </button>
+      <button onclick="exportData()" class="w-9 h-9 rounded-xl bg-app-card border border-app-cardBorder text-app-cyan flex items-center justify-center active-scale">
+        <i class="ph-bold ph-export text-lg"></i>
+      </button>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+  <main class="px-4 pt-4 max-w-lg mx-auto space-y-4">
 
-    <!-- Month Navigation Bar & Quick Controls -->
-    <section class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 bg-brand-card p-4 rounded-2xl border border-brand-border shadow-xl">
-      <div class="flex items-center gap-3">
-        <button id="prevMonthBtn" onclick="changeMonth(-1)" class="p-2.5 rounded-xl border border-brand-border bg-brand-bg hover:bg-brand-accent/10 hover:border-brand-accent/50 text-gray-300 hover:text-brand-plum transition-all">
-          <i class="ph-bold ph-caret-left text-lg"></i>
-        </button>
-        <div class="flex items-center gap-2">
-          <select id="monthSelect" onchange="onMonthYearChange()" class="bg-brand-bg border border-brand-border text-white text-base font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-brand-accent cursor-pointer">
-            <option value="0">Enero</option>
-            <option value="1">Febrero</option>
-            <option value="2">Marzo</option>
-            <option value="3">Abril</option>
-            <option value="4">Mayo</option>
-            <option value="5">Junio</option>
-            <option value="6">Julio</option>
-            <option value="7">Agosto</option>
-            <option value="8">Septiembre</option>
-            <option value="9">Octubre</option>
-            <option value="10">Noviembre</option>
-            <option value="11">Diciembre</option>
-          </select>
-          <select id="yearSelect" onchange="onMonthYearChange()" class="bg-brand-bg border border-brand-border text-white text-base font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-brand-accent cursor-pointer">
-            <!-- Dynamically populated from 2026 onwards -->
-          </select>
+    <!-- Month Navigation Pill -->
+    <div class="bg-app-card p-2 rounded-2xl border border-app-cardBorder flex items-center justify-between">
+      <button id="prevMonthBtn" onclick="changeMonth(-1)" class="w-10 h-10 rounded-xl bg-app-bg border border-app-cardBorder flex items-center justify-center text-gray-200 active-scale">
+        <i class="ph-bold ph-caret-left text-lg"></i>
+      </button>
+
+      <div class="flex items-center gap-1.5">
+        <select id="monthSelect" onchange="onMonthYearChange()" class="bg-transparent text-sm font-bold text-white focus:outline-none cursor-pointer py-1">
+          <option value="0">Enero</option>
+          <option value="1">Febrero</option>
+          <option value="2">Marzo</option>
+          <option value="3">Abril</option>
+          <option value="4">Mayo</option>
+          <option value="5">Junio</option>
+          <option value="6">Julio</option>
+          <option value="7">Agosto</option>
+          <option value="8">Septiembre</option>
+          <option value="9">Octubre</option>
+          <option value="10">Noviembre</option>
+          <option value="11">Diciembre</option>
+        </select>
+        <select id="yearSelect" onchange="onMonthYearChange()" class="bg-transparent text-sm font-bold text-app-purple focus:outline-none cursor-pointer py-1">
+          <!-- Populated from 2026 onwards -->
+        </select>
+      </div>
+
+      <button id="nextMonthBtn" onclick="changeMonth(1)" class="w-10 h-10 rounded-xl bg-app-bg border border-app-cardBorder flex items-center justify-center text-gray-200 active-scale">
+        <i class="ph-bold ph-caret-right text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Main Summary Card (KPIs) -->
+    <div class="bg-gradient-to-br from-app-card via-app-card to-app-purple/10 p-4 rounded-2xl neon-border space-y-3">
+      <div class="flex justify-between items-center border-b border-app-cardBorder/60 pb-2.5">
+        <span class="text-xs uppercase tracking-wider font-semibold text-app-subtext">Resumen Mensual</span>
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-app-purple/20 text-app-purple border border-app-purple/30" id="monthBadge">Octubre 2026</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center pt-1">
+        <!-- Ordinary Hours -->
+        <div class="bg-app-bg/60 p-2.5 rounded-xl border border-app-cardBorder">
+          <p class="text-[10px] font-medium text-app-subtext uppercase">Base</p>
+          <p class="text-lg font-extrabold text-app-cyan" id="kpiBaseHours">0h</p>
         </div>
-        <button id="nextMonthBtn" onclick="changeMonth(1)" class="p-2.5 rounded-xl border border-brand-border bg-brand-bg hover:bg-brand-accent/10 hover:border-brand-accent/50 text-gray-300 hover:text-brand-plum transition-all">
-          <i class="ph-bold ph-caret-right text-lg"></i>
-        </button>
-      </div>
 
-      <!-- Quick Template Actions -->
-      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
-        <button onclick="applyDefaultScheduleToMonth()" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-brand-accent/10 hover:bg-brand-accent/20 border border-brand-accent/30 text-brand-plum text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2">
-          <i class="ph-bold ph-magic-wand"></i>
-          <span>Autocompletar Mes (Lun-Vie)</span>
-        </button>
-        <button onclick="resetCurrentMonth()" class="w-full sm:w-auto px-3 py-2 rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5" title="Reiniciar mes">
-          <i class="ph-bold ph-trash"></i>
-          <span>Limpiar Mes</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- KPI Summary Dashboard -->
-    <section class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
-      <!-- Days Worked -->
-      <div class="bg-brand-card p-4 rounded-2xl border border-brand-border card-bg shadow-lg relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity text-emerald-400">
-          <i class="ph-bold ph-briefcase text-4xl"></i>
+        <!-- Overtime Hours -->
+        <div class="bg-app-bg/60 p-2.5 rounded-xl border border-app-cardBorder">
+          <p class="text-[10px] font-medium text-app-subtext uppercase">Extras</p>
+          <p class="text-lg font-extrabold text-app-pink" id="kpiExtraHours">+0h</p>
         </div>
-        <p class="text-xs font-medium text-brand-textMuted uppercase tracking-wider mb-1">Días Trabajados</p>
-        <p id="kpiDaysWorked" class="text-2xl sm:text-3xl font-extrabold text-white">0 <span class="text-xs font-normal text-brand-textMuted">días</span></p>
-      </div>
 
-      <!-- Days Off -->
-      <div class="bg-brand-card p-4 rounded-2xl border border-brand-border card-bg shadow-lg relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity text-purple-400">
-          <i class="ph-bold ph-coffee text-4xl"></i>
+        <!-- Grand Total Hours -->
+        <div class="bg-app-purple/20 p-2.5 rounded-xl border border-app-purple/40">
+          <p class="text-[10px] font-medium text-app-purple uppercase">Total</p>
+          <p class="text-lg font-extrabold text-white" id="kpiTotalHours">0h</p>
         </div>
-        <p class="text-xs font-medium text-brand-textMuted uppercase tracking-wider mb-1">Días Libres</p>
-        <p id="kpiDaysOff" class="text-2xl sm:text-3xl font-extrabold text-brand-plum">0 <span class="text-xs font-normal text-brand-textMuted">días</span></p>
       </div>
 
-      <!-- Ordinary Hours -->
-      <div class="bg-brand-card p-4 rounded-2xl border border-brand-border card-bg shadow-lg relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity text-sky-400">
-          <i class="ph-bold ph-clock text-4xl"></i>
+      <!-- Contract Overtime Bar -->
+      <div class="space-y-1 pt-1">
+        <div class="flex justify-between text-[11px] text-app-subtext">
+          <span>Suma mensual trabajada</span>
+          <span id="contractComparisonText">0 / 80 hrs esperadas</span>
         </div>
-        <p class="text-xs font-medium text-brand-textMuted uppercase tracking-wider mb-1">Horas Ordinarias</p>
-        <p id="kpiOrdinaryHours" class="text-2xl sm:text-3xl font-extrabold text-sky-400">0.0 <span class="text-xs font-normal text-brand-textMuted">hrs</span></p>
-      </div>
-
-      <!-- Overtime Hours -->
-      <div class="bg-brand-card p-4 rounded-2xl border border-brand-border card-bg shadow-lg relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity text-amber-400">
-          <i class="ph-bold ph-lightning text-4xl"></i>
+        <div class="w-full h-2 rounded-full bg-app-bg overflow-hidden p-0.5 border border-app-cardBorder">
+          <div id="contractProgressBar" class="h-full bg-gradient-to-r from-app-cyan to-app-purple rounded-full transition-all duration-300" style="width: 0%"></div>
         </div>
-        <p class="text-xs font-medium text-brand-textMuted uppercase tracking-wider mb-1">Horas Extra</p>
-        <p id="kpiExtraHours" class="text-2xl sm:text-3xl font-extrabold text-amber-400">0.0 <span class="text-xs font-normal text-brand-textMuted">hrs</span></p>
       </div>
+    </div>
 
-      <!-- Grand Total Hours -->
-      <div class="col-span-2 lg:col-span-1 bg-gradient-to-br from-brand-accent/20 to-brand-card p-4 rounded-2xl border border-brand-accent/40 card-bg shadow-xl relative overflow-hidden">
-        <div class="absolute top-0 right-0 p-3 opacity-15 text-brand-plum">
-          <i class="ph-bold ph-calculator text-4xl"></i>
-        </div>
-        <p class="text-xs font-medium text-brand-plum uppercase tracking-wider mb-1">Gran Total Horas</p>
-        <p id="kpiTotalHours" class="text-2xl sm:text-3xl font-extrabold text-white">0.0 <span class="text-xs font-normal text-brand-plum">hrs</span></p>
-      </div>
-    </section>
+    <!-- Quick Month Autofill Button -->
+    <div class="flex gap-2">
+      <button onclick="applyDefaultMonth()" class="flex-1 py-2.5 px-3 bg-app-card hover:bg-app-cardBorder border border-app-cardBorder text-xs font-semibold rounded-xl text-gray-200 flex items-center justify-center gap-1.5 active-scale">
+        <i class="ph-bold ph-magic-wand text-app-purple"></i>
+        <span>Llenar mes con mi horario habitual</span>
+      </button>
+    </div>
 
-    <!-- Spreadsheet Main Table Container -->
-    <section class="bg-brand-card rounded-2xl border border-brand-border shadow-2xl overflow-hidden mb-12">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[850px]">
-          <thead>
-            <tr class="bg-brand-bg/90 border-b border-brand-border text-xs uppercase text-brand-textMuted tracking-wider font-semibold">
-              <th class="py-3.5 px-4 w-32">Día</th>
-              <th class="py-3.5 px-4 w-40">Estado / Tipo</th>
-              <th class="py-3.5 px-4 w-28 text-center">Entrada</th>
-              <th class="py-3.5 px-4 w-28 text-center">Salida</th>
-              <th class="py-3.5 px-4 w-28 text-center">Descanso (m)</th>
-              <th class="py-3.5 px-4 w-28 text-center">H. Ordinarias</th>
-              <th class="py-3.5 px-4 w-28 text-center">H. Extras</th>
-              <th class="py-3.5 px-4 w-28 text-center">Total Día</th>
-              <th class="py-3.5 px-4">Notas / Detalle</th>
-            </tr>
-          </thead>
-          <tbody id="scheduleTableBody" class="divide-y divide-brand-border/40 text-sm">
-            <!-- Dynamic Spreadsheet Rows Generated via JavaScript -->
-          </tbody>
-          <tfoot class="bg-brand-bg/90 font-bold border-t border-brand-border">
-            <tr>
-              <td colspan="5" class="py-4 px-4 text-right text-xs uppercase tracking-wider text-brand-textMuted">Totales Mensuales:</td>
-              <td id="footOrdinary" class="py-4 px-4 text-center text-sky-400">0.0h</td>
-              <td id="footExtra" class="py-4 px-4 text-center text-amber-400">0.0h</td>
-              <td id="footTotal" class="py-4 px-4 text-center text-brand-plum text-base">0.0h</td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </section>
+    <!-- Daily Cards Accordion List -->
+    <div id="daysList" class="space-y-3">
+      <!-- Generated via JavaScript -->
+    </div>
+
   </main>
 
-  <!-- Settings Modal (Base Schedule Config) -->
-  <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
-    <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-md p-6 shadow-2xl transform scale-95 transition-transform duration-200" id="settingsModalCard">
-      <div class="flex items-center justify-between pb-4 border-b border-brand-border mb-4">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="ph-bold ph-sliders-horizontal text-brand-plum"></i>
-          Configurar Horario Base
-        </h3>
-        <button onclick="closeSettingsModal()" class="text-brand-textMuted hover:text-white p-1 rounded-lg">
-          <i class="ph-bold ph-x text-lg"></i>
+  <!-- Quick Edit Modal -->
+  <div id="editModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-app-card border-t sm:border border-app-cardBorder rounded-t-3xl sm:rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl animate-in slide-in-from-bottom duration-200">
+      
+      <div class="flex justify-between items-center pb-2 border-b border-app-cardBorder">
+        <div>
+          <h3 class="text-base font-bold text-white" id="modalDayTitle">Editar Día</h3>
+          <p class="text-xs text-app-subtext" id="modalDaySubtitle">Lunes 26 de Octubre</p>
+        </div>
+        <button onclick="closeEditModal()" class="w-8 h-8 rounded-full bg-app-bg text-gray-400 flex items-center justify-center">
+          <i class="ph-bold ph-x text-base"></i>
         </button>
       </div>
 
-      <p class="text-xs text-brand-textMuted mb-4">
-        Define el horario predeterminado que realizas en un día laboral habitual. Este horario se usará al autocompletar el mes.
-      </p>
+      <!-- Shift Type Segmented Control -->
+      <div class="grid grid-cols-3 gap-1.5 p-1 bg-app-bg rounded-xl border border-app-cardBorder text-xs font-semibold">
+        <button id="typeTrabajo" onclick="setModalShiftType('Trabajo')" class="py-2 rounded-lg text-center active-scale transition-all">💼 Trabajo</button>
+        <button id="typeDescanso" onclick="setModalShiftType('Descanso')" class="py-2 rounded-lg text-center active-scale transition-all">☕ Descanso</button>
+        <button id="typeVacaciones" onclick="setModalShiftType('Vacaciones')" class="py-2 rounded-lg text-center active-scale transition-all">🌴 Vacaciones</button>
+      </div>
 
-      <div class="space-y-4">
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Hora Entrada Base</label>
-            <input type="time" id="defaultStartTime" value="09:00" class="w-full bg-brand-bg border border-brand-border rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-accent">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Hora Salida Base</label>
-            <input type="time" id="defaultEndTime" value="18:00" class="w-full bg-brand-bg border border-brand-border rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-accent">
+      <!-- Turn Fields (Visible when Trabajo) -->
+      <div id="shiftTimeInputs" class="space-y-3">
+        <!-- Turn 1 -->
+        <div class="p-3 bg-app-bg/80 rounded-xl border border-app-cardBorder space-y-2">
+          <span class="text-[11px] font-bold text-app-purple uppercase tracking-wider">Turno Mañana / Continuo</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-app-subtext mb-1">Entrada</label>
+              <input type="time" id="mStart1" class="w-full bg-app-card border border-app-cardBorder rounded-lg px-2 py-2 text-xs text-white text-center focus:border-app-purple">
+            </div>
+            <div>
+              <label class="block text-[10px] text-app-subtext mb-1">Salida</label>
+              <input type="time" id="mEnd1" class="w-full bg-app-card border border-app-cardBorder rounded-lg px-2 py-2 text-xs text-white text-center focus:border-app-purple">
+            </div>
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Descanso Predeterminado (Minutos)</label>
-          <input type="number" id="defaultBreakMinutes" value="60" min="0" max="240" step="15" class="w-full bg-brand-bg border border-brand-border rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-accent">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Tope Horas Ordinarias / Día</label>
-          <input type="number" id="defaultMaxOrdinary" value="8" min="1" max="24" step="0.5" class="w-full bg-brand-bg border border-brand-border rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-accent">
-          <span class="text-[10px] text-brand-textMuted mt-1 block">El exceso de horas calculadas pasará automáticamente a Horas Extras.</span>
+        <!-- Turn 2 (Partido) -->
+        <div class="p-3 bg-app-bg/80 rounded-xl border border-app-cardBorder space-y-2">
+          <span class="text-[11px] font-bold text-app-cyan uppercase tracking-wider">Turno Tarde / Noche (Partido)</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-app-subtext mb-1">Entrada 2</label>
+              <input type="time" id="mStart2" class="w-full bg-app-card border border-app-cardBorder rounded-lg px-2 py-2 text-xs text-white text-center focus:border-app-cyan">
+            </div>
+            <div>
+              <label class="block text-[10px] text-app-subtext mb-1">Salida 2</label>
+              <input type="time" id="mEnd2" class="w-full bg-app-card border border-app-cardBorder rounded-lg px-2 py-2 text-xs text-white text-center focus:border-app-cyan">
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-brand-border">
-        <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-brand-textMuted hover:text-white border border-brand-border">Cancelar</button>
-        <button onclick="saveSettings()" class="px-4 py-2 rounded-xl bg-brand-accent hover:bg-brand-accentHover text-white text-xs font-semibold transition-all">Guardar Configuración</button>
+      <!-- Manual Overtime & Notes -->
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[10px] font-bold text-app-pink uppercase mb-1">H. Extras Manuales</label>
+          <div class="flex items-center bg-app-bg border border-app-cardBorder rounded-xl px-2 py-1.5">
+            <input type="number" id="mExtra" step="0.5" min="0" max="12" placeholder="0" class="w-full bg-transparent text-sm font-bold text-app-pink text-center focus:outline-none">
+            <span class="text-xs text-app-subtext pr-1">hrs</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-app-subtext uppercase mb-1">Nota del día</label>
+          <input type="text" id="mNote" placeholder="Ej: Cubrí a Camila" class="w-full bg-app-bg border border-app-cardBorder rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-app-purple">
+        </div>
+      </div>
+
+      <!-- Quick add buttons inside modal -->
+      <div class="flex gap-2">
+        <button onclick="addModalExtra(0.5)" class="flex-1 py-1.5 rounded-lg bg-app-pink/10 border border-app-pink/30 text-app-pink text-xs font-bold active-scale">+30 min extra</button>
+        <button onclick="addModalExtra(1)" class="flex-1 py-1.5 rounded-lg bg-app-pink/20 border border-app-pink/40 text-app-pink text-xs font-bold active-scale">+1 hora extra</button>
+      </div>
+
+      <div class="pt-2 flex gap-2">
+        <button onclick="saveModalRecord()" class="w-full py-3 rounded-xl bg-gradient-to-r from-app-purple to-app-cyan text-white text-xs font-extrabold uppercase tracking-wider active-scale">Guardar Cambios</button>
       </div>
     </div>
   </div>
 
-  <!-- Notification Toast -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-brand-card border border-brand-accent/40 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-    <i class="ph-bold ph-check-circle text-emerald-400 text-xl" id="toastIcon"></i>
-    <span id="toastMsg" class="text-xs font-medium">Configuración guardada</span>
+  <!-- Contract Settings Modal -->
+  <div id="configModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-app-card border border-app-cardBorder rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-app-cardBorder pb-2">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="ph-bold ph-sliders text-app-purple"></i> Ajustes de Contrato
+        </h3>
+        <button onclick="closeConfigModal()" class="text-gray-400">
+          <i class="ph-bold ph-x text-base"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-gray-300 mb-1">Horas Base Semanales (Según Contrato)</label>
+          <input type="number" id="cfgWeeklyBase" value="20" min="1" max="60" class="w-full bg-app-bg border border-app-cardBorder rounded-xl px-3 py-2 text-white font-bold text-sm focus:border-app-purple">
+          <p class="text-[10px] text-app-subtext mt-1">El sistema calculará como Horas Extras lo que supere esta base por semana.</p>
+        </div>
+
+        <div class="border-t border-app-cardBorder pt-3">
+          <label class="block font-semibold text-gray-300 mb-1">Turno Habitual Predeterminado</label>
+          <div class="grid grid-cols-2 gap-2 mt-1">
+            <div>
+              <span class="text-[10px] text-app-subtext">Entrada habitual</span>
+              <input type="time" id="cfgDefStart" value="19:00" class="w-full bg-app-bg border border-app-cardBorder rounded-lg p-2 text-white text-center">
+            </div>
+            <div>
+              <span class="text-[10px] text-app-subtext">Salida habitual</span>
+              <input type="time" id="cfgDefEnd" value="23:00" class="w-full bg-app-bg border border-app-cardBorder rounded-lg p-2 text-white text-center">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 flex gap-2">
+        <button onclick="saveConfig()" class="w-full py-2.5 rounded-xl bg-app-purple text-white font-bold text-xs active-scale">Guardar Configuración</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    // --- Application State ---
-    const START_YEAR = 2026;
-    const START_MONTH = 9; // October (0-indexed)
+    // --- APP STATE ---
+    const MIN_YEAR = 2026;
+    const MIN_MONTH = 9; // Octubre (0-indexed)
 
-    let currentYear = START_YEAR;
-    let currentMonth = START_MONTH;
+    let currentYear = 2026;
+    let currentMonth = 9;
+    let activeEditingDateKey = null;
 
-    // Config defaults stored in localStorage
-    let userConfig = {
-      defaultStartTime: "09:00",
-      defaultEndTime: "18:00",
-      defaultBreakMinutes: 60,
-      defaultMaxOrdinary: 8
+    let appConfig = {
+      weeklyBase: 20,
+      defStart: "19:00",
+      defEnd: "23:00"
     };
 
-    // Store data per date key "YYYY-MM-DD"
-    let records = {};
+    let records = {}; // Key: "YYYY-MM-DD"
 
-    // Days of week Spanish labels
     const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-    // --- Core Lifecycle ---
     window.onload = function() {
-      loadLocalStorage();
-      initYearSelector();
-      setSelectValues();
-      renderTable();
+      loadStorage();
+      setupYearSelect();
+      syncHeaderAndSelects();
+      renderApp();
     };
 
-    function loadLocalStorage() {
-      const savedConfig = localStorage.getItem('hours_tracker_config');
-      if (savedConfig) {
-        try { userConfig = JSON.parse(savedConfig); } catch(e){}
-      }
-      const savedRecords = localStorage.getItem('hours_tracker_records');
-      if (savedRecords) {
-        try { records = JSON.parse(savedRecords); } catch(e){}
-      }
+    function loadStorage() {
+      const cfg = localStorage.getItem('m_hours_config');
+      if (cfg) { try { appConfig = JSON.parse(cfg); } catch(e){} }
+
+      const rec = localStorage.getItem('m_hours_records');
+      if (rec) { try { records = JSON.parse(rec); } catch(e){} }
     }
 
-    function saveToLocalStorage() {
-      localStorage.setItem('hours_tracker_config', JSON.stringify(userConfig));
-      localStorage.setItem('hours_tracker_records', JSON.stringify(records));
+    function saveStorage() {
+      localStorage.setItem('m_hours_config', JSON.stringify(appConfig));
+      localStorage.setItem('m_hours_records', JSON.stringify(records));
     }
 
-    function initYearSelector() {
-      const yearSelect = document.getElementById('yearSelect');
-      yearSelect.innerHTML = '';
-      for (let y = 2026; y <= 2035; y++) {
+    function setupYearSelect() {
+      const yr = document.getElementById('yearSelect');
+      yr.innerHTML = '';
+      for (let y = 2026; y <= 2032; y++) {
         const opt = document.createElement('option');
         opt.value = y;
         opt.textContent = y;
-        yearSelect.appendChild(opt);
+        yr.appendChild(opt);
       }
     }
 
-    function setSelectValues() {
+    function syncHeaderAndSelects() {
       document.getElementById('monthSelect').value = currentMonth;
       document.getElementById('yearSelect').value = currentYear;
-      updateMonthNavButtons();
-    }
+      document.getElementById('headerContractLabel').textContent = `Contrato: ${appConfig.weeklyBase}h / semana`;
+      document.getElementById('monthBadge').textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
-    function updateMonthNavButtons() {
-      // Disable navigation prior to October 2026
-      const isStart = (currentYear === START_YEAR && currentMonth === START_MONTH);
+      // Navigation lock (minimum Oct 2026)
+      const isStart = (currentYear === MIN_YEAR && currentMonth === MIN_MONTH);
       document.getElementById('prevMonthBtn').disabled = isStart;
-      if(isStart) {
-        document.getElementById('prevMonthBtn').classList.add('opacity-30', 'cursor-not-allowed');
-      } else {
-        document.getElementById('prevMonthBtn').classList.remove('opacity-30', 'cursor-not-allowed');
-      }
+      document.getElementById('prevMonthBtn').style.opacity = isStart ? "0.3" : "1";
     }
 
     function onMonthYearChange() {
       currentMonth = parseInt(document.getElementById('monthSelect').value);
       currentYear = parseInt(document.getElementById('yearSelect').value);
-      
-      // Guard enforcement: minimum date Oct 2026
-      if (currentYear < START_YEAR || (currentYear === START_YEAR && currentMonth < START_MONTH)) {
-        currentYear = START_YEAR;
-        currentMonth = START_MONTH;
-        setSelectValues();
+
+      if (currentYear < MIN_YEAR || (currentYear === MIN_YEAR && currentMonth < MIN_MONTH)) {
+        currentYear = MIN_YEAR;
+        currentMonth = MIN_MONTH;
       }
-      
-      updateMonthNavButtons();
-      renderTable();
+      syncHeaderAndSelects();
+      renderApp();
     }
 
     function changeMonth(delta) {
-      let newMonth = currentMonth + delta;
-      let newYear = currentYear;
+      let m = currentMonth + delta;
+      let y = currentYear;
+      if (m > 11) { m = 0; y++; }
+      if (m < 0) { m = 11; y--; }
 
-      if (newMonth > 11) {
-        newMonth = 0;
-        newYear++;
-      } else if (newMonth < 0) {
-        newMonth = 11;
-        newYear--;
-      }
+      if (y < MIN_YEAR || (y === MIN_YEAR && m < MIN_MONTH)) return;
 
-      if (newYear < START_YEAR || (newYear === START_YEAR && newMonth < START_MONTH)) {
-        return; // Restrict earlier than Oct 2026
-      }
-
-      currentMonth = newMonth;
-      currentYear = newYear;
-      setSelectValues();
-      renderTable();
+      currentMonth = m;
+      currentYear = y;
+      syncHeaderAndSelects();
+      renderApp();
     }
 
-    // --- Table Rendering & Calculations ---
-    function renderTable() {
-      const tbody = document.getElementById('scheduleTableBody');
-      tbody.innerHTML = '';
+    // --- MAIN RENDER & CALCULATIONS ---
+    function renderApp() {
+      const daysList = document.getElementById('daysList');
+      daysList.innerHTML = '';
 
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-      let kpiWorked = 0;
-      let kpiOff = 0;
-      let totalOrdinary = 0;
-      let totalExtra = 0;
+      let monthTotalOrdinary = 0;
+      let monthTotalExtra = 0;
 
-      for (let d = 1; d <= daysInMonth; d++) {
+      for (let d = 1; d <= totalDaysInMonth; d++) {
         const dateObj = new Date(currentYear, currentMonth, d);
-        const dayOfWeekIndex = dateObj.getDay();
+        const dayIdx = dateObj.getDay();
         const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const isWeekend = (dayOfWeekIndex === 0 || dayOfWeekIndex === 6);
+        const isWeekend = (dayIdx === 0 || dayIdx === 6);
 
-        // Fetch or init record
         let rec = records[dateKey];
         if (!rec) {
           rec = {
-            type: isWeekend ? 'Libre' : 'Trabajo',
-            startTime: isWeekend ? '' : userConfig.defaultStartTime,
-            endTime: isWeekend ? '' : userConfig.defaultEndTime,
-            breakMinutes: isWeekend ? 0 : userConfig.defaultBreakMinutes,
-            manualExtra: 0,
-            notes: ''
+            type: isWeekend ? 'Descanso' : 'Trabajo',
+            s1: isWeekend ? '' : appConfig.defStart,
+            e1: isWeekend ? '' : appConfig.defEnd,
+            s2: '',
+            e2: '',
+            extra: 0,
+            note: ''
           };
         }
 
-        // Calculate hours based on inputs
-        const calc = calculateHours(rec);
+        const calc = computeDayHours(rec);
+        monthTotalOrdinary += calc.ordinary;
+        monthTotalExtra += calc.extra;
 
-        // Update Stats
-        if (rec.type === 'Trabajo') kpiWorked++;
-        if (rec.type === 'Libre') kpiOff++;
-        totalOrdinary += calc.ordinary;
-        totalExtra += calc.extra;
+        // Render Card for Day
+        const card = document.createElement('div');
+        card.className = `bg-app-card border rounded-2xl p-3.5 space-y-2.5 transition-all ${
+          rec.type === 'Descanso' ? 'border-app-cardBorder opacity-80' : 
+          rec.type === 'Vacaciones' ? 'border-app-cyan/30 bg-app-cyan/5' : 'border-app-cardBorder hover:border-app-purple/40'
+        }`;
 
-        // Build Table Row
-        const tr = document.createElement('tr');
-        tr.className = `transition-colors hover:bg-brand-border/20 ${isWeekend ? 'bg-brand-bg/40' : ''}`;
+        let statusBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-app-green/20 text-app-green border border-app-green/30">Trabajo</span>`;
+        if (rec.type === 'Descanso') statusBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-app-purple/20 text-app-purple border border-app-purple/30">Descanso</span>`;
+        if (rec.type === 'Vacaciones') statusBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-app-cyan/20 text-app-cyan border border-app-cyan/30">Vacaciones</span>`;
 
-        // Highlight Libre/Vacaciones visually
-        let typeBadgeColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
-        if (rec.type === 'Libre') typeBadgeColor = 'text-purple-400 bg-purple-500/10 border-purple-500/20';
-        if (rec.type === 'Vacaciones') typeBadgeColor = 'text-sky-400 bg-sky-500/10 border-sky-500/20';
-        if (rec.type === 'Licencia') typeBadgeColor = 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+        let turnSummary = "Sin turno anotado";
+        if (rec.type === 'Trabajo') {
+          let t1 = (rec.s1 && rec.e1) ? `${rec.s1} - ${rec.e1}` : '';
+          let t2 = (rec.s2 && rec.e2) ? ` / ${rec.s2} - ${rec.e2}` : '';
+          turnSummary = t1 + t2 || "Toque para ingresar turno";
+        } else turnSummary = rec.type;
 
-        tr.innerHTML = `
-          <!-- Date / Day -->
-          <td class="py-2.5 px-4 font-medium text-gray-200">
-            <div class="flex items-center gap-2">
-              <span class="text-base font-bold ${isWeekend ? 'text-brand-plum' : 'text-white'}">${String(d).padStart(2, '0')}</span>
-              <span class="text-xs text-brand-textMuted">${dayNames[dayOfWeekIndex].substring(0,3)}</span>
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-xl bg-app-bg border border-app-cardBorder flex flex-col items-center justify-center">
+                <span class="text-xs font-extrabold ${isWeekend ? 'text-app-pink' : 'text-white'}">${String(d).padStart(2,'0')}</span>
+                <span class="text-[9px] font-semibold text-app-subtext uppercase">${dayNames[dayIdx].substring(0,3)}</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-bold text-white">${dayNames[dayIdx]}</span>
+                  ${statusBadge}
+                </div>
+                <p class="text-[11px] text-app-subtext">${turnSummary}</p>
+              </div>
             </div>
-          </td>
 
-          <!-- Type / Status Select -->
-          <td class="py-2.5 px-4">
-            <select onchange="updateRecord('${dateKey}', 'type', this.value)" class="w-full bg-brand-bg border border-brand-border text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand-accent ${typeBadgeColor} border">
-              <option value="Trabajo" ${rec.type === 'Trabajo' ? 'selected' : ''}>💼 Trabajo</option>
-              <option value="Libre" ${rec.type === 'Libre' ? 'selected' : ''}>☕ Libre</option>
-              <option value="Vacaciones" ${rec.type === 'Vacaciones' ? 'selected' : ''}>🌴 Vacaciones</option>
-              <option value="Licencia" ${rec.type === 'Licencia' ? 'selected' : ''}>🏥 Licencia</option>
-            </select>
-          </td>
+            <!-- Hours Total Pill -->
+            <div class="text-right">
+              <span class="text-sm font-extrabold ${calc.total > 0 ? 'text-white' : 'text-app-subtext'}">${calc.total.toFixed(1)}h</span>
+              ${calc.extra > 0 ? `<p class="text-[10px] font-bold text-app-pink">+${calc.extra.toFixed(1)}h extra</p>` : ''}
+            </div>
+          </div>
 
-          <!-- Entrada -->
-          <td class="py-2.5 px-4 text-center">
-            <input type="time" value="${rec.startTime || ''}" ${rec.type !== 'Trabajo' ? 'disabled' : ''} onchange="updateRecord('${dateKey}', 'startTime', this.value)" class="w-full text-center bg-brand-bg border border-brand-border text-xs text-white rounded-lg px-1.5 py-1.5 focus:outline-none focus:border-brand-accent disabled:opacity-30 disabled:cursor-not-allowed">
-          </td>
+          ${rec.note ? `<div class="text-[11px] bg-app-bg/80 border border-app-cardBorder px-2.5 py-1 rounded-lg text-gray-300 italic">“${rec.note}”</div>` : ''}
 
-          <!-- Salida -->
-          <td class="py-2.5 px-4 text-center">
-            <input type="time" value="${rec.endTime || ''}" ${rec.type !== 'Trabajo' ? 'disabled' : ''} onchange="updateRecord('${dateKey}', 'endTime', this.value)" class="w-full text-center bg-brand-bg border border-brand-border text-xs text-white rounded-lg px-1.5 py-1.5 focus:outline-none focus:border-brand-accent disabled:opacity-30 disabled:cursor-not-allowed">
-          </td>
-
-          <!-- Descanso (Minutos) -->
-          <td class="py-2.5 px-4 text-center">
-            <input type="number" min="0" max="240" step="5" value="${rec.breakMinutes !== undefined ? rec.breakMinutes : 0}" ${rec.type !== 'Trabajo' ? 'disabled' : ''} onchange="updateRecord('${dateKey}', 'breakMinutes', parseFloat(this.value)||0)" class="w-20 text-center bg-brand-bg border border-brand-border text-xs text-white rounded-lg px-1.5 py-1.5 focus:outline-none focus:border-brand-accent disabled:opacity-30 disabled:cursor-not-allowed">
-          </td>
-
-          <!-- H. Ordinarias (Calculadas) -->
-          <td class="py-2.5 px-4 text-center font-semibold text-sky-400">
-            ${calc.ordinary.toFixed(1)}h
-          </td>
-
-          <!-- H. Extras (Ingreso numérico manual o suplementario) -->
-          <td class="py-2.5 px-4 text-center">
-            <input type="number" min="0" max="24" step="0.5" value="${rec.manualExtra || (calc.calculatedExtra > 0 ? calc.calculatedExtra : '')}" ${rec.type !== 'Trabajo' && rec.type !== 'Libre' ? 'disabled' : ''} placeholder="${calc.calculatedExtra > 0 ? calc.calculatedExtra.toFixed(1) : '0'}" onchange="updateRecord('${dateKey}', 'manualExtra', parseFloat(this.value)||0)" class="w-20 text-center bg-brand-bg border border-brand-border text-xs text-amber-400 font-bold rounded-lg px-1.5 py-1.5 focus:outline-none focus:border-brand-accent disabled:opacity-30 disabled:cursor-not-allowed">
-          </td>
-
-          <!-- Total Día -->
-          <td class="py-2.5 px-4 text-center font-bold text-white">
-            ${calc.total.toFixed(1)}h
-          </td>
-
-          <!-- Notas -->
-          <td class="py-2.5 px-4">
-            <input type="text" value="${rec.notes || ''}" placeholder="Escribir nota..." onchange="updateRecord('${dateKey}', 'notes', this.value)" class="w-full bg-brand-bg/50 border border-brand-border text-xs text-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand-accent placeholder-brand-textMuted/40">
-          </td>
+          <!-- Quick Action Buttons Bar -->
+          <div class="flex items-center gap-1.5 pt-1 border-t border-app-cardBorder/50">
+            <button onclick="openEditModal('${dateKey}')" class="flex-1 py-1.5 rounded-lg bg-app-bg border border-app-cardBorder text-[11px] font-bold text-gray-200 flex items-center justify-center gap-1 active-scale">
+              <i class="ph-bold ph-pencil text-app-purple"></i> Editar
+            </button>
+            <button onclick="quickAddExtra('${dateKey}', 1)" class="py-1.5 px-2.5 rounded-lg bg-app-pink/10 border border-app-pink/30 text-[11px] font-bold text-app-pink active-scale">
+              +1h Extra
+            </button>
+            <button onclick="toggleQuickRest('${dateKey}')" class="py-1.5 px-2.5 rounded-lg bg-app-bg border border-app-cardBorder text-[11px] font-bold text-app-subtext active-scale">
+              ${rec.type === 'Descanso' ? '💼' : '☕'}
+            </button>
+          </div>
         `;
 
-        tbody.appendChild(tr);
+        daysList.appendChild(card);
       }
 
       // Update KPI Cards
-      document.getElementById('kpiDaysWorked').innerHTML = `${kpiWorked} <span class="text-xs font-normal text-brand-textMuted">días</span>`;
-      document.getElementById('kpiDaysOff').innerHTML = `${kpiOff} <span class="text-xs font-normal text-brand-textMuted">días</span>`;
-      document.getElementById('kpiOrdinaryHours').innerHTML = `${totalOrdinary.toFixed(1)} <span class="text-xs font-normal text-brand-textMuted">hrs</span>`;
-      document.getElementById('kpiExtraHours').innerHTML = `${totalExtra.toFixed(1)} <span class="text-xs font-normal text-brand-textMuted">hrs</span>`;
-      document.getElementById('kpiTotalHours').innerHTML = `${(totalOrdinary + totalExtra).toFixed(1)} <span class="text-xs font-normal text-brand-plum">hrs</span>`;
+      document.getElementById('kpiBaseHours').textContent = `${monthTotalOrdinary.toFixed(1)}h`;
+      document.getElementById('kpiExtraHours').textContent = `+${monthTotalExtra.toFixed(1)}h`;
+      document.getElementById('kpiTotalHours').textContent = `${(monthTotalOrdinary + monthTotalExtra).toFixed(1)}h`;
 
-      // Update Footer Totals
-      document.getElementById('footOrdinary').textContent = `${totalOrdinary.toFixed(1)}h`;
-      document.getElementById('footExtra').textContent = `${totalExtra.toFixed(1)}h`;
-      document.getElementById('footTotal').textContent = `${(totalOrdinary + totalExtra).toFixed(1)}h`;
+      // Monthly Expected Calculation (WeeklyBase * ~4.33 weeks)
+      const expectedMonthly = Math.round(appConfig.weeklyBase * 4.33);
+      const grandTotal = monthTotalOrdinary + monthTotalExtra;
+      document.getElementById('contractComparisonText').textContent = `${grandTotal.toFixed(1)} / ${expectedMonthly} hrs aprox.`;
+
+      let progressPct = Math.min(100, Math.round((grandTotal / expectedMonthly) * 100));
+      document.getElementById('contractProgressBar').style.width = `${progressPct}%`;
     }
 
-    // Hours Calculation Helper
-    function calculateHours(rec) {
-      if (rec.type !== 'Trabajo' && rec.type !== 'Libre') {
-        return { ordinary: 0, calculatedExtra: 0, extra: 0, total: 0 };
+    // Helper: Compute Hours for a Record
+    function computeDayHours(rec) {
+      if (rec.type !== 'Trabajo') return { ordinary: 0, extra: 0, total: 0 };
+
+      let totalMins = 0;
+
+      // Turn 1
+      if (rec.s1 && rec.e1) {
+        totalMins += getMinutesBetween(rec.s1, rec.e1);
+      }
+      // Turn 2
+      if (rec.s2 && rec.e2) {
+        totalMins += getMinutesBetween(rec.s2, rec.e2);
       }
 
-      let ordinary = 0;
-      let calculatedExtra = 0;
-
-      if (rec.type === 'Trabajo' && rec.startTime && rec.endTime) {
-        const [startH, startM] = rec.startTime.split(':').map(Number);
-        const [endH, endM] = rec.endTime.split(':').map(Number);
-
-        let startInMinutes = startH * 60 + startM;
-        let endInMinutes = endH * 60 + endM;
-
-        // Handle overnight shifts if end < start
-        if (endInMinutes < startInMinutes) {
-          endInMinutes += 24 * 60;
-        }
-
-        let totalWorkedMinutes = endInMinutes - startInMinutes - (rec.breakMinutes || 0);
-        if (totalWorkedMinutes < 0) totalWorkedMinutes = 0;
-
-        let totalWorkedHours = totalWorkedMinutes / 60;
-
-        const maxOrd = userConfig.defaultMaxOrdinary || 8;
-        if (totalWorkedHours > maxOrd) {
-          ordinary = maxOrd;
-          calculatedExtra = totalWorkedHours - maxOrd;
-        } else {
-          ordinary = totalWorkedHours;
-          calculatedExtra = 0;
-        }
-      }
-
-      // If user provided manual extra input, use manual extra; otherwise use calculated auto-extra
-      const extra = (rec.manualExtra !== undefined && rec.manualExtra !== null && rec.manualExtra !== 0) 
-        ? rec.manualExtra 
-        : calculatedExtra;
+      let totalWorkedHours = totalMins / 60;
+      let manualExtra = parseFloat(rec.extra) || 0;
 
       return {
-        ordinary: ordinary,
-        calculatedExtra: calculatedExtra,
-        extra: extra,
-        total: ordinary + extra
+        ordinary: totalWorkedHours,
+        extra: manualExtra,
+        total: totalWorkedHours + manualExtra
       };
     }
 
-    function updateRecord(dateKey, field, value) {
+    function getMinutesBetween(start, end) {
+      const [sh, sm] = start.split(':').map(Number);
+      const [eh, em] = end.split(':').map(Number);
+      let s = sh * 60 + sm;
+      let e = eh * 60 + em;
+      if (e < s) e += 24 * 60; // Nocturno
+      return Math.max(0, e - s);
+    }
+
+    // --- QUICK ACTIONS ---
+    function quickAddExtra(dateKey, hours) {
       if (!records[dateKey]) {
+        records[dateKey] = { type: 'Trabajo', s1: appConfig.defStart, e1: appConfig.defEnd, s2:'', e2:'', extra: 0, note: '' };
+      }
+      records[dateKey].extra = (parseFloat(records[dateKey].extra) || 0) + hours;
+      saveStorage();
+      renderApp();
+    }
+
+    function toggleQuickRest(dateKey) {
+      if (!records[dateKey]) {
+        records[dateKey] = { type: 'Descanso', s1: '', e1: '', s2:'', e2:'', extra: 0, note: '' };
+      } else {
+        records[dateKey].type = records[dateKey].type === 'Descanso' ? 'Trabajo' : 'Descanso';
+        if (records[dateKey].type === 'Trabajo' && !records[dateKey].s1) {
+          records[dateKey].s1 = appConfig.defStart;
+          records[dateKey].e1 = appConfig.defEnd;
+        }
+      }
+      saveStorage();
+      renderApp();
+    }
+
+    function applyDefaultMonth() {
+      if (!confirm("¿Deseas autocompletar este mes con tus turnos habituales (Lunes a Viernes)?")) return;
+
+      const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+      for (let d = 1; d <= totalDays; d++) {
+        const dateObj = new Date(currentYear, currentMonth, d);
+        const dayIdx = dateObj.getDay();
+        const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isWeekend = (dayIdx === 0 || dayIdx === 6);
+
         records[dateKey] = {
-          type: 'Trabajo',
-          startTime: userConfig.defaultStartTime,
-          endTime: userConfig.defaultEndTime,
-          breakMinutes: userConfig.defaultBreakMinutes,
-          manualExtra: 0,
-          notes: ''
+          type: isWeekend ? 'Descanso' : 'Trabajo',
+          s1: isWeekend ? '' : appConfig.defStart,
+          e1: isWeekend ? '' : appConfig.defEnd,
+          s2: '',
+          e2: '',
+          extra: 0,
+          note: ''
         };
       }
-
-      records[dateKey][field] = value;
-
-      // If changing to libre/vacaciones, clear or auto adapt
-      if (field === 'type' && value !== 'Trabajo') {
-        if (value === 'Libre') {
-          records[dateKey].startTime = '';
-          records[dateKey].endTime = '';
-          records[dateKey].breakMinutes = 0;
-        }
-      } else if (field === 'type' && value === 'Trabajo' && !records[dateKey].startTime) {
-        records[dateKey].startTime = userConfig.defaultStartTime;
-        records[dateKey].endTime = userConfig.defaultEndTime;
-        records[dateKey].breakMinutes = userConfig.defaultBreakMinutes;
-      }
-
-      saveToLocalStorage();
-      renderTable();
+      saveStorage();
+      renderApp();
     }
 
-    // --- Bulk Schedule Actions ---
-    function applyDefaultScheduleToMonth() {
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    // --- MODAL EDIT ---
+    let currentModalShiftType = 'Trabajo';
 
-      for (let d = 1; d <= daysInMonth; d++) {
+    function openEditModal(dateKey) {
+      activeEditingDateKey = dateKey;
+      const rec = records[dateKey] || { type: 'Trabajo', s1: appConfig.defStart, e1: appConfig.defEnd, s2:'', e2:'', extra: 0, note: '' };
+
+      const [y, m, d] = dateKey.split('-');
+      const dateObj = new Date(y, parseInt(m)-1, d);
+      document.getElementById('modalDayTitle').textContent = `${dayNames[dateObj.getDay()]} ${d}`;
+      document.getElementById('modalDaySubtitle').textContent = `${monthNames[parseInt(m)-1]} ${y}`;
+
+      document.getElementById('mStart1').value = rec.s1 || '';
+      document.getElementById('mEnd1').value = rec.e1 || '';
+      document.getElementById('mStart2').value = rec.s2 || '';
+      document.getElementById('mEnd2').value = rec.e2 || '';
+      document.getElementById('mExtra').value = rec.extra || '';
+      document.getElementById('mNote').value = rec.note || '';
+
+      setModalShiftType(rec.type || 'Trabajo');
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    function setModalShiftType(type) {
+      currentModalShiftType = type;
+      const btnT = document.getElementById('typeTrabajo');
+      const btnD = document.getElementById('typeDescanso');
+      const btnV = document.getElementById('typeVacaciones');
+      const inputs = document.getElementById('shiftTimeInputs');
+
+      btnT.className = `py-2 rounded-lg text-center active-scale transition-all ${type==='Trabajo'?'bg-app-green/20 text-app-green border border-app-green/40 font-bold':'text-app-subtext'}`;
+      btnD.className = `py-2 rounded-lg text-center active-scale transition-all ${type==='Descanso'?'bg-app-purple/20 text-app-purple border border-app-purple/40 font-bold':'text-app-subtext'}`;
+      btnV.className = `py-2 rounded-lg text-center active-scale transition-all ${type==='Vacaciones'?'bg-app-cyan/20 text-app-cyan border border-app-cyan/40 font-bold':'text-app-subtext'}`;
+
+      if (type === 'Trabajo') inputs.classList.remove('hidden');
+      else inputs.classList.add('hidden');
+    }
+
+    function addModalExtra(hrs) {
+      const input = document.getElementById('mExtra');
+      let val = parseFloat(input.value) || 0;
+      input.value = (val + hrs).toFixed(1);
+    }
+
+    function saveModalRecord() {
+      if (!activeEditingDateKey) return;
+
+      records[activeEditingDateKey] = {
+        type: currentModalShiftType,
+        s1: document.getElementById('mStart1').value,
+        e1: document.getElementById('mEnd1').value,
+        s2: document.getElementById('mStart2').value,
+        e2: document.getElementById('mEnd2').value,
+        extra: parseFloat(document.getElementById('mExtra').value) || 0,
+        note: document.getElementById('mNote').value.trim()
+      };
+
+      saveStorage();
+      closeEditModal();
+      renderApp();
+    }
+
+    // --- CONFIG MODAL ---
+    function openConfigModal() {
+      document.getElementById('cfgWeeklyBase').value = appConfig.weeklyBase;
+      document.getElementById('cfgDefStart').value = appConfig.defStart;
+      document.getElementById('cfgDefEnd').value = appConfig.defEnd;
+      document.getElementById('configModal').classList.remove('hidden');
+    }
+
+    function closeConfigModal() {
+      document.getElementById('configModal').classList.add('hidden');
+    }
+
+    function saveConfig() {
+      appConfig.weeklyBase = parseFloat(document.getElementById('cfgWeeklyBase').value) || 20;
+      appConfig.defStart = document.getElementById('cfgDefStart').value || "19:00";
+      appConfig.defEnd = document.getElementById('cfgDefEnd').value || "23:00";
+
+      saveStorage();
+      syncHeaderAndSelects();
+      closeConfigModal();
+      renderApp();
+    }
+
+    // --- EXPORT ---
+    function exportData() {
+      let csv = "Fecha,Dia,Estado,Entrada 1,Salida 1,Entrada 2,Salida 2,Horas Ordinarias,Horas Extras,Total,Nota\n";      const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      for (let d = 1; d <= totalDays; d++) {
         const dateObj = new Date(currentYear, currentMonth, d);
-        const dayOfWeekIndex = dateObj.getDay();
         const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const isWeekend = (dayOfWeekIndex === 0 || dayOfWeekIndex === 6);
+        const rec = records[dateKey] || { type: 'Descanso' };
+        const calc = computeDayHours(rec);
 
-        if (!records[dateKey]) {
-          records[dateKey] = {};
-        }
-
-        if (isWeekend) {
-          records[dateKey].type = 'Libre';
-          records[dateKey].startTime = '';
-          records[dateKey].endTime = '';
-          records[dateKey].breakMinutes = 0;
-        } else {
-          records[dateKey].type = 'Trabajo';
-          records[dateKey].startTime = userConfig.defaultStartTime;
-          records[dateKey].endTime = userConfig.defaultEndTime;
-          records[dateKey].breakMinutes = userConfig.defaultBreakMinutes;
-        }
+        csv += `${dateKey},${dayNames[dateObj.getDay()]},${rec.type||'Trabajo'},${rec.s1||''},${rec.e1||''},${rec.s2||''},${rec.e2||''},${calc.ordinary.toFixed(2)},${calc.extra.toFixed(2)},${calc.total.toFixed(2)},"${(rec.note||'').replace(/"/g, '""')}"\n`;
       }
 
-      saveToLocalStorage();
-      renderTable();
-      showToast('Horario base aplicado a lunes-viernes de este mes');
-    }
-
-    function resetCurrentMonth() {
-      if (!confirm('¿Seguro que deseas limpiar los registros de este mes?')) return;
-
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        delete records[dateKey];
-      }
-
-      saveToLocalStorage();
-      renderTable();
-      showToast('Registros del mes reiniciados');
-    }
-
-    // --- Settings Modal Handlers ---
-    function openSettingsModal() {
-      document.getElementById('defaultStartTime').value = userConfig.defaultStartTime;
-      document.getElementById('defaultEndTime').value = userConfig.defaultEndTime;
-      document.getElementById('defaultBreakMinutes').value = userConfig.defaultBreakMinutes;
-      document.getElementById('defaultMaxOrdinary').value = userConfig.defaultMaxOrdinary;
-
-      const modal = document.getElementById('settingsModal');
-      const card = document.getElementById('settingsModalCard');
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        card.classList.remove('scale-95');
-      }, 10);
-    }
-
-    function closeSettingsModal() {
-      const modal = document.getElementById('settingsModal');
-      const card = document.getElementById('settingsModalCard');
-      modal.classList.add('opacity-0');
-      card.classList.add('scale-95');
-      setTimeout(() => {
-        modal.classList.add('hidden');
-      }, 200);
-    }
-
-    function saveSettings() {
-      userConfig.defaultStartTime = document.getElementById('defaultStartTime').value;
-      userConfig.defaultEndTime = document.getElementById('defaultEndTime').value;
-      userConfig.defaultBreakMinutes = parseFloat(document.getElementById('defaultBreakMinutes').value) || 0;
-      userConfig.defaultMaxOrdinary = parseFloat(document.getElementById('defaultMaxOrdinary').value) || 8;
-
-      saveToLocalStorage();
-      closeSettingsModal();
-      renderTable();
-      showToast('Configuración del horario base guardada');
-    }
-
-    // --- CSV Export Functionality ---
-    function exportToCSV() {
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Fecha,Dia,Estado,Hora Entrada,Hora Salida,Descanso (min),Horas Ordinarias,Horas Extras,Total Horas,Notas\n";
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateObj = new Date(currentYear, currentMonth, d);
-        const dayOfWeekIndex = dateObj.getDay();
-        const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const rec = records[dateKey] || { type: (dayOfWeekIndex===0||dayOfWeekIndex===6)?'Libre':'Trabajo' };
-        const calc = calculateHours(rec);
-
-        const row = [
-          dateKey,
-          dayNames[dayOfWeekIndex],
-          rec.type || 'Trabajo',
-          rec.startTime || '',
-          rec.endTime || '',
-          rec.breakMinutes || 0,
-          calc.ordinary.toFixed(2),
-          calc.extra.toFixed(2),
-          calc.total.toFixed(2),
-          `"${(rec.notes || '').replace(/"/g, '""')}"`
-        ];
-
-        csvContent += row.join(",") + "\n";
-      }
-
-      const encodedUri = encodeURI(csvContent);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Horarios_${monthNames[currentMonth]}_${currentYear}.csv`);
-      document.body.appendChild(link);
+      link.href = URL.createObjectURL(blob);
+      link.download = `Horarios_${monthNames[currentMonth]}_${currentYear}.csv`;
       link.click();
-      document.body.removeChild(link);
-
-      showToast('Archivo CSV descargado con éxito');
-    }
-
-    // --- Toast UI helper ---
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').textContent = msg;
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
     }
   </script>
 </body>
